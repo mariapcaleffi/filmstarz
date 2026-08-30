@@ -427,6 +427,205 @@ function showToast(message) {
    DOWNLOAD
 ========================= */
 
+/* =========================
+   CRIAR FUNDO BORRADO
+========================= */
+
+function createBlurredBackground(imageSrc, blurAmount, darkAmount) {
+
+  return new Promise((resolve, reject) => {
+
+    const img = new Image();
+
+    img.onload = () => {
+
+      // Tamanho real do story
+      const width = 1080;
+      const height = 1920;
+
+      /*
+        Criamos um canvas menor primeiro.
+        Isso ajuda a produzir um desfoque
+        mais natural e compatível com exportação.
+      */
+
+      const smallWidth = 270;
+      const smallHeight = 480;
+
+      const smallCanvas =
+        document.createElement("canvas");
+
+      smallCanvas.width = smallWidth;
+      smallCanvas.height = smallHeight;
+
+      const smallCtx =
+        smallCanvas.getContext("2d");
+
+      /*
+        Calcula o "cover", igual ao object-fit: cover
+      */
+
+      const imageRatio =
+        img.width / img.height;
+
+      const canvasRatio =
+        smallWidth / smallHeight;
+
+      let drawWidth;
+      let drawHeight;
+      let offsetX;
+      let offsetY;
+
+      if (imageRatio > canvasRatio) {
+
+        drawHeight = smallHeight;
+        drawWidth =
+          drawHeight * imageRatio;
+
+        offsetX =
+          (smallWidth - drawWidth) / 2;
+
+        offsetY = 0;
+
+      } else {
+
+        drawWidth = smallWidth;
+
+        drawHeight =
+          drawWidth / imageRatio;
+
+        offsetX = 0;
+
+        offsetY =
+          (smallHeight - drawHeight) / 2;
+
+      }
+
+      /*
+        Desenha a imagem em resolução reduzida.
+        Quando ampliamos novamente, ela fica
+        naturalmente borrada.
+      */
+
+      smallCtx.drawImage(
+        img,
+        offsetX,
+        offsetY,
+        drawWidth,
+        drawHeight
+      );
+
+
+      /*
+        Agora criamos o canvas final
+      */
+
+      const canvas =
+        document.createElement("canvas");
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx =
+        canvas.getContext("2d");
+
+      ctx.imageSmoothingEnabled = true;
+
+      ctx.imageSmoothingQuality = "high";
+
+
+      /*
+        Aplicamos blur adicional caso o navegador
+        suporte Canvas Filter.
+      */
+
+      try {
+
+        ctx.filter =
+          `blur(${Math.max(blurAmount / 2, 1)}px)`;
+
+      } catch (error) {
+
+        console.log(
+          "Canvas filter não disponível."
+        );
+
+      }
+
+
+      /*
+        Amplia a imagem borrada
+      */
+
+      ctx.drawImage(
+        smallCanvas,
+        0,
+        0,
+        width,
+        height
+      );
+
+
+      /*
+        Remove o filtro para não afetar
+        o overlay escuro.
+      */
+
+      ctx.filter = "none";
+
+
+      /*
+        Escurecimento do fundo
+      */
+
+      if (darkAmount > 0) {
+
+        ctx.fillStyle =
+          `rgba(0,0,0,${darkAmount / 100})`;
+
+        ctx.fillRect(
+          0,
+          0,
+          width,
+          height
+        );
+
+      }
+
+
+      resolve(
+        canvas.toDataURL(
+          "image/jpeg",
+          0.95
+        )
+      );
+
+    };
+
+
+    img.onerror = () => {
+
+      reject(
+        new Error(
+          "Não foi possível carregar o poster."
+        )
+      );
+
+    };
+
+
+    img.src = imageSrc;
+
+  });
+
+}
+
+
+
+/* =========================
+   DOWNLOAD DO STORY
+========================= */
+
 $("downloadBtn").addEventListener(
   "click",
   async () => {
@@ -445,6 +644,17 @@ $("downloadBtn").addEventListener(
     }
 
 
+    if (!state.posterURL) {
+
+      showToast(
+        "Envie um poster antes de baixar."
+      );
+
+      return;
+
+    }
+
+
     const button =
       $("downloadBtn");
 
@@ -455,35 +665,142 @@ $("downloadBtn").addEventListener(
 
     try {
 
-      button.disabled =
-        true;
+      button.disabled = true;
 
 
       button.innerHTML =
         "<span>…</span> Gerando Story";
 
 
+      /*
+        ========================================
+        1. GUARDAR A IMAGEM ORIGINAL
+        ========================================
+      */
+
+      const originalBg =
+        $("bgImage").src;
+
+      const originalFilter =
+        $("bgImage").style.filter;
+
+
+      /*
+        ========================================
+        2. CRIAR A VERSÃO BORRADA
+        ========================================
+      */
+
+      const blurredBackground =
+        await createBlurredBackground(
+          originalBg,
+          state.blur,
+          state.dark
+        );
+
+
+      /*
+        ========================================
+        3. COLOCAR A IMAGEM BORRADA NO STORY
+        ========================================
+      */
+
+      $("bgImage").src =
+        blurredBackground;
+
+
+      /*
+        IMPORTANTE:
+        removemos o blur CSS porque agora
+        a própria imagem já está borrada.
+      */
+
+      $("bgImage").style.filter =
+        "none";
+
+
+      /*
+        Como o escurecimento também já foi
+        aplicado na imagem, removemos o
+        overlay temporariamente.
+      */
+
+      const originalOverlay =
+        $("bgOverlay").style.background;
+
+
+      $("bgOverlay").style.background =
+        "rgba(0,0,0,0)";
+
+
+      /*
+        Pequena espera para o navegador
+        atualizar a imagem antes da captura.
+      */
+
+      await new Promise(
+        resolve =>
+          setTimeout(resolve, 150)
+      );
+
+
+      /*
+        ========================================
+        4. CAPTURAR STORY
+        ========================================
+      */
+
       const canvas =
         await html2canvas(
           $("story"),
           {
 
-            scale:
-              1080 /
-              $("story")
-                .getBoundingClientRect()
-                .width,
+            width: 337.5,
+
+            height: 600,
+
+            scale: 1080 / 337.5,
 
             useCORS: true,
 
-            backgroundColor:
-              "#081522",
+            allowTaint: false,
 
-            logging: false
+            backgroundColor:
+              "#081022",
+
+            logging: false,
+
+            imageTimeout: 15000
 
           }
         );
 
+
+      /*
+        ========================================
+        5. RESTAURAR O PREVIEW
+        ========================================
+      */
+
+      $("bgImage").src =
+        originalBg;
+
+
+      $("bgImage").style.filter =
+        originalFilter ||
+        `blur(${state.blur}px)`;
+
+
+      $("bgOverlay").style.background =
+        originalOverlay ||
+        `rgba(0,0,0,${state.dark / 100})`;
+
+
+      /*
+        ========================================
+        6. DOWNLOAD
+        ========================================
+      */
 
       const cleanTitle =
         (
@@ -503,9 +820,7 @@ $("downloadBtn").addEventListener(
 
 
       const link =
-        document.createElement(
-          "a"
-        );
+        document.createElement("a");
 
 
       link.download =
@@ -514,16 +829,25 @@ $("downloadBtn").addEventListener(
 
       link.href =
         canvas.toDataURL(
-          "image/png",
-          1
+          "image/png"
         );
+
+
+      document.body.appendChild(
+        link
+      );
 
 
       link.click();
 
 
+      document.body.removeChild(
+        link
+      );
+
+
       showToast(
-        "Story baixado com sucesso!"
+        "Story baixado com sucesso! ✨"
       );
 
 
@@ -531,14 +855,30 @@ $("downloadBtn").addEventListener(
 
       console.error(error);
 
+
+      /*
+        Caso dê algum erro, tentamos
+        restaurar o preview.
+      */
+
+      $("bgImage").style.filter =
+        `blur(${state.blur}px)`;
+
+
+      $("bgOverlay").style.background =
+        `rgba(0,0,0,${state.dark / 100})`;
+
+
       showToast(
         "Não foi possível gerar o Story."
       );
+
 
     } finally {
 
       button.disabled =
         false;
+
 
       button.innerHTML =
         original;
