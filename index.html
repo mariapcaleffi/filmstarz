@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>filmstarz</title>
+
+  <meta
+    name="description"
+    content="Crie stories cinematográficos personalizados com seu poster e sua avaliação."
+  >
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:wght@400;700&family=Playfair+Display:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+</head>
+
+
+<body>
+
+
+<header class="topbar">
+
+  <a
+    class="brand"
+    href="#"
+  >
+
+    <span class="brand-mark">
+      ★
+    </span>
+
+    film<span>starz</span>
+
+  </a>
+
+
+  <div class="tagline">
+    seu filme. sua nota. seu story.
+  </div>
+
+</header>
+
+
+
+<main class="app">
+
+
+  <section class="intro">
+
+
+    <div>
+
+      <p class="eyebrow">
+        GERADOR DE STORIES
+      </p>
+
+
+      <h1>
+
+        do
+
+        <em>cinema</em> para o story.
+
+      </h1>
+
+
+      <p class="sub">
+
+        Crie um story personalizado com o poster do filme,
+        informações, estrelas e aquele toque especial de fã de cinema.
+
+      </p>
+
+    </div>
+
+
+    <div class="film-strip">
+
+      ✦　✦　✦　✦　✦
+
+    </div>
+
+
+  </section>
+
+
+
+  <section class="workspace">
+
+
+    <!-- =========================
+         FORMULÁRIO
+    ========================== -->
+
+
+    <aside class="panel">
+
+
+      <div class="panel-head">
+
+        <div>
+
+          <p class="eyebrow">
+            01 — INFORMAÇÕES
+          </p>
+
+          <h2>
+            Seu filme
+          </h2>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="form-grid">
+
+
+        <label class="field full">
+
+          <span>
+            Nome do filme
+          </span>
+
+
+          <input
+            id="title"
+            type="text"
+            placeholder="Ex.: Isle of Dogs"
+            maxlength="45"
+          >
+
+        </label>
+
+
+
+        <label class="field">
+
+          <span>
+            Ano
+          </span>
+
+
+          <input
+            id="year"
+            type="text"
+            inputmode="numeric"
+            placeholder="Ex: 2018"
+            maxlength="4"
+          >
+
+        </label>
+
+
+
+        <label class="field">
+
+          <span>
+            Diretor
+          </span>
+
+
+          <input
+            id="director"
+            type="text"
+            placeholder="Ex: Wes Anderson"
+            maxlength="35"
+          >
+
+        </label>
+
+
+
+        <label class="field full">
+
+          <span>
+
+            Resenha / comentário
+
+            <small>
+              (opcional)
+            </small>
+
+          </span>
+
+
+          <textarea
+            id="review"
+            rows="3"
+            maxlength="170"
+            placeholder="Escreva uma frase sobre o filme..."
+          ></textarea>
+
+
+          <div class="counter">
+
+            <span id="reviewCount">
+              0
+            </span>
+
+            /170
+
+          </div>
+
+        </label>
+
+
+      </div>
+
+
+
+      <div class="divider"></div>
+
+
+
+      <p class="eyebrow">
+        02 — POSTER
+      </p>
+
+
+
+      <label
+        class="upload"
+        id="uploadArea"
+      >
+
+
+        <input
+          id="posterInput"
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/gif"
+        >
+
+
+        <span class="upload-icon">
+          ＋
+        </span>
+
+
+        <strong>
+          Enviar poster
+        </strong>
+
+
+        <small>
+          PNG, JPG, WEBP ou GIF
+        </small>
+
+
+      </label>
+
+
+      <div
+        class="file-name"
+        id="fileName"
+      ></div>
+
+
+
+      <div class="controls">
+
+
+        <!-- NOTA -->
+
+        <div class="control-block">
+
+
+          <div class="control-label">
+
+            <span>
+              Nota
+            </span>
+
+
+            <strong id="ratingText">
+              5/5
+            </strong>
+
+          </div>
+
+
+
+          <div
+            class="stars-input"
+            id="starsInput"
+          >
+
+
+            <button
+              type="button"
+              data-rating="1"
+            >
+              ★
+            </button>
+
+
+            <button
+              type="button"
+              data-rating="2"
+            >
+              ★
+            </button>
+
+
+            <button
+              type="button"
+              data-rating="3"
+            >
+              ★
+            </button>
+
+
+            <button
+              type="button"
+              data-rating="4"
+            >
+              ★
+            </button>
+
+
+            <button
+              type="button"
+              data-rating="5"
+            >
+              ★
+            </button>
+
+
+          </div>
+
+
+        </div>
+
+
+
+        <!-- CORAÇÃO + FONTE -->
+
+        <div class="control-row">
+
+
+          <div>
+
+            <div class="control-label">
+
+              <span>
+                Favorito?
+              </span>
+
+            </div>
+
+
+            <button
+              type="button"
+              class="heart-toggle active"
+              id="heartToggle"
+              aria-pressed="true"
+            >
+
+              ♥
+
+            </button>
+
+          </div>
+
+
+
+          <label class="select-field">
+
+            <span>
+              Fonte
+            </span>
+
+
+            <select id="fontSelect">
+
+
+              <option value="Inter">
+                Inter — Moderna
+              </option>
+
+
+              <option value="Playfair Display">
+                Playfair — Elegante
+              </option>
+
+
+              <option value="Bebas Neue">
+                Bebas — Cinema
+              </option>
+
+
+              <option value="DM Mono">
+                DM Mono — Retrô
+              </option>
+
+
+              <option value="Libre Baskerville">
+                Baskerville — Clássica
+              </option>
+
+
+              <option value="Space Grotesk">
+                Space Grotesk — Clean
+              </option>
+
+
+            </select>
+
+
+          </label>
+
+
+        </div>
+
+
+
+        <!-- BLUR -->
+
+        <div class="control-block">
+
+
+          <div class="control-label">
+
+            <span>
+              Desfoque do fundo
+            </span>
+
+
+            <strong>
+
+              <span id="blurValue">
+                18
+              </span>
+
+              px
+
+            </strong>
+
+          </div>
+
+
+          <input
+            id="blurRange"
+            class="range"
+            type="range"
+            min="0"
+            max="35"
+            value="18"
+          >
+
+
+        </div>
+
+
+
+        <!-- ESCURECIMENTO -->
+
+        <div class="control-block">
+
+
+          <div class="control-label">
+
+            <span>
+              Escurecer fundo
+            </span>
+
+
+            <strong>
+
+              <span id="darkValue">
+                45
+              </span>
+
+              %
+
+            </strong>
+
+          </div>
+
+
+          <input
+            id="darkRange"
+            class="range"
+            type="range"
+            min="0"
+            max="80"
+            value="45"
+          >
+
+
+        </div>
+
+
+      </div>
+
+
+
+      <button
+        class="download-btn"
+        id="downloadBtn"
+      >
+
+        <span>
+          ↓
+        </span>
+
+        Baixar meu Story
+
+      </button>
+
+
+
+      <button
+        class="reset-btn"
+        id="resetBtn"
+      >
+
+        Limpar e começar de novo
+
+      </button>
+
+
+    </aside>
+
+
+
+    <!-- =========================
+         PREVIEW
+    ========================== -->
+
+
+    <section class="preview-area">
+
+
+      <div class="preview-head">
+
+
+        <div>
+
+          <p class="eyebrow">
+            03 — PREVIEW
+          </p>
+
+          <h2>
+            Seu story
+          </h2>
+
+        </div>
+
+
+        <span class="size-badge">
+          9 : 16
+        </span>
+
+
+      </div>
+
+
+
+      <div class="phone-stage">
+
+
+        <div
+          id="story"
+          class="story"
+        >
+
+
+          <img
+            id="bgImage"
+            class="story-bg"
+            alt=""
+          >
+
+
+          <div
+            id="bgOverlay"
+            class="story-overlay"
+          ></div>
+
+
+          <div class="grain"></div>
+
+
+
+          <div class="story-content">
+
+
+            <div class="story-top">
+
+
+              <span class="mini-label">
+                FILME DA VEZ
+              </span>
+
+
+              <span
+                class="heart-preview"
+                id="heartPreview"
+              >
+                ♥
+              </span>
+
+
+            </div>
+
+
+
+            <div class="poster-wrap">
+
+
+              <div
+                class="poster-placeholder"
+                id="posterPlaceholder"
+              >
+
+                <span>
+                  POSTER
+                </span>
+
+                <small>
+                  envie uma imagem
+                </small>
+
+              </div>
+
+
+              <img
+                id="posterImage"
+                class="poster"
+                alt="Poster do filme"
+              >
+
+
+            </div>
+
+
+
+            <div class="story-info">
+
+
+              <div
+                class="story-title"
+                id="storyTitle"
+              >
+                SEU FILME
+              </div>
+
+
+              <div class="story-meta">
+
+                <span id="storyYear">
+                  2026
+                </span>
+
+
+                <i>
+                  •
+                </i>
+
+
+                <span id="storyDirector">
+                  SEU DIRETOR
+                </span>
+
+              </div>
+
+
+              <div
+                class="rating"
+                id="storyRating"
+              >
+                ★★★★★
+              </div>
+
+
+              <div
+                class="review"
+                id="storyReview"
+              >
+                Sua resenha aparece aqui.
+              </div>
+
+
+            </div>
+
+
+
+            <div class="story-footer">
+
+              filmstarz
+
+              <span>
+                ✦
+              </span>
+
+            </div>
+
+
+          </div>
+
+
+        </div>
+
+
+      </div>
+
+
+      <p class="hint">
+
+        O preview é atualizado em tempo real.
+        O arquivo baixado terá 1080 × 1920 px.
+
+      </p>
+
+
+    </section>
+
+
+  </section>
+
+
+</main>
+
+
+
+<footer class="site-footer">
+
+  by <strong>@mariapcaleffi</strong>
+
+</footer>
+
+
+
+<div
+  id="toast"
+  class="toast"
+>
+  Story baixado com sucesso!
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script src="script.js"></script>
+
+
+</body>
+</html>
