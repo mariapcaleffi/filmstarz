@@ -1,575 +1,259 @@
-/* =====================================================
+/* =========================================================
    FILMSTARZ
-   Gerador de Stories de Filmes
-   Canvas 1080 x 1920
-===================================================== */
+   Gerador de Stories
+   Exportação real em Canvas 1080 x 1920
+   Compatível com PC + celular
+========================================================= */
 
 
-/* =====================================================
-   PEGAR ELEMENTOS
-===================================================== */
+/* =========================================================
+   FUNÇÃO AUXILIAR
+========================================================= */
 
 const $ = (id) => document.getElementById(id);
 
 
-/* =====================================================
-   ESTADO DO APLICATIVO
-===================================================== */
+/* =========================================================
+   ESTADO
+========================================================= */
 
 const state = {
 
-    posterURL: "",
+    rating: 5,
 
-    rating: 0,
+    favorite: true,
 
-    favorite: false,
+    font: "Inter",
 
-    blur: 12,
+    blur: 18,
 
-    dark: 35,
+    dark: 45,
 
-    font: "Inter"
+    posterURL: ""
 
 };
 
 
-/* =====================================================
-   ELEMENTOS
-===================================================== */
+/* =========================================================
+   ATUALIZAR ESTRELAS DO FORMULÁRIO
+========================================================= */
 
-const titleInput =
-    $("title");
+function updateRatingButtons() {
 
-const yearInput =
-    $("year");
+    document
+        .querySelectorAll(".stars-input button")
+        .forEach((button) => {
 
-const directorInput =
-    $("director");
+            const value =
+                Number(button.dataset.rating);
 
-const reviewInput =
-    $("review");
+            button.classList.toggle(
+                "active",
+                value <= state.rating
+            );
 
-const posterInput =
-    $("posterInput");
+        });
 
-const uploadBox =
-    $("uploadBox");
-
-const uploadPreview =
-    $("uploadPreview");
-
-const storyPoster =
-    $("storyPoster");
-
-const bgImage =
-    $("bgImage");
-
-const storyTitle =
-    $("storyTitle");
-
-const storyYear =
-    $("storyYear");
-
-const storyDirector =
-    $("storyDirector");
-
-const storyReview =
-    $("storyReview");
-
-const storyStars =
-    $("storyStars");
-
-const storyHeart =
-    $("storyHeart");
-
-const favoriteButton =
-    $("favoriteButton");
-
-const fontSelect =
-    $("fontSelect");
-
-const blurRange =
-    $("blurRange");
-
-const darkRange =
-    $("darkRange");
-
-const blurValue =
-    $("blurValue");
-
-const darkValue =
-    $("darkValue");
-
-const characterCount =
-    $("characterCount");
-
-const downloadBtn =
-    $("downloadBtn");
-
-const toast =
-    $("toast");
+}
 
 
-/* =====================================================
+/* =========================================================
    ATUALIZAR PREVIEW
-===================================================== */
+========================================================= */
 
 function updatePreview() {
 
     const title =
-        titleInput.value.trim();
+        $("title").value.trim();
 
     const year =
-        yearInput.value.trim();
+        $("year").value.trim();
 
     const director =
-        directorInput.value.trim();
+        $("director").value.trim();
 
     const review =
-        reviewInput.value.trim();
+        $("review").value.trim();
 
 
-    /*
-        Título
-    */
+    /* -----------------------------------------
+       TÍTULO
+    ----------------------------------------- */
 
-    storyTitle.textContent =
-        title
-            ? title.toUpperCase()
-            : "SEU FILME";
+    $("storyTitle").textContent =
+        title || "SEU FILME";
 
 
-    /*
-        Ano
-    */
+    /* -----------------------------------------
+       ANO
+    ----------------------------------------- */
 
-    storyYear.textContent =
+    $("storyYear").textContent =
         year || "2026";
 
 
-    /*
-        Diretor
-    */
+    /* -----------------------------------------
+       DIRETOR
+    ----------------------------------------- */
 
-    storyDirector.textContent =
-        director
-            ? director.toUpperCase()
-            : "SEU DIRETOR";
+    $("storyDirector").textContent =
+        director || "SEU DIRETOR";
 
 
-    /*
-        Resenha
-    */
+    /* -----------------------------------------
+       RESENHA
+    ----------------------------------------- */
 
-    storyReview.textContent =
+    $("storyReview").textContent =
         review ||
-        "sua resenha aparecerá aqui";
+        "Sua resenha aparece aqui.";
 
 
-    /*
-        Estrelas
-    */
+    /* -----------------------------------------
+       CONTADOR
+    ----------------------------------------- */
 
-    storyStars.textContent =
+    $("reviewCount").textContent =
+        $("review").value.length;
+
+
+    /* -----------------------------------------
+       NOTA
+    ----------------------------------------- */
+
+    $("ratingText").textContent =
+        `${state.rating}/5`;
+
+
+    $("storyRating").textContent =
         "★".repeat(state.rating) +
         "☆".repeat(5 - state.rating);
 
 
-    /*
-        Coração
-    */
+    /* -----------------------------------------
+       FONTE
+    ----------------------------------------- */
 
-    storyHeart.style.display =
+    $("storyTitle").style.fontFamily =
+        `"${state.font}", sans-serif`;
+
+
+    $("storyReview").style.fontFamily =
+        `"${state.font}", sans-serif`;
+
+
+    /* -----------------------------------------
+       CORAÇÃO
+    ----------------------------------------- */
+
+    $("heartPreview").classList.toggle(
+        "visible",
         state.favorite
-            ? "block"
-            : "none";
+    );
 
 
-    /*
-        Fonte
-    */
-
-    storyTitle.style.fontFamily =
-        `"${state.font}", sans-serif`;
-
-    storyReview.style.fontFamily =
-        `"${state.font}", sans-serif`;
+    $("heartToggle").classList.toggle(
+        "active",
+        state.favorite
+    );
 
 
-    /*
-        Blur
-    */
+    $("heartToggle").setAttribute(
+        "aria-pressed",
+        String(state.favorite)
+    );
 
-    bgImage.style.filter =
+
+    /* -----------------------------------------
+       VALORES DOS CONTROLES
+    ----------------------------------------- */
+
+    $("blurValue").textContent =
+        state.blur;
+
+
+    $("darkValue").textContent =
+        state.dark;
+
+
+    /* -----------------------------------------
+       BLUR DO PREVIEW
+    ----------------------------------------- */
+
+    $("bgImage").style.filter =
         `blur(${state.blur}px)`;
 
 
-    /*
-        Escurecimento
-    */
+    /* -----------------------------------------
+       ESCURECIMENTO
+    ----------------------------------------- */
 
-    bgImage.style.opacity =
-        "1";
-
-    document
-        .getElementById("bgOverlay")
-        .style.background =
+    $("bgOverlay").style.background =
         `rgba(0,0,0,${state.dark / 100})`;
 
 }
 
 
-/* =====================================================
-   INPUTS DE TEXTO
-===================================================== */
-
-titleInput.addEventListener(
-    "input",
-    updatePreview
-);
-
-
-yearInput.addEventListener(
-    "input",
-    updatePreview
-);
-
-
-directorInput.addEventListener(
-    "input",
-    updatePreview
-);
-
-
-reviewInput.addEventListener(
-    "input",
-    () => {
-
-        characterCount.textContent =
-            reviewInput.value.length;
-
-        updatePreview();
-
-    }
-);
-
-
-/* =====================================================
-   UPLOAD DO POSTER
-===================================================== */
-
-posterInput.addEventListener(
-    "change",
-    (event) => {
-
-        const file =
-            event.target.files[0];
-
-
-        if (!file) {
-            return;
-        }
-
-
-        /*
-            Verificar tipo
-        */
-
-        if (
-            !file.type.startsWith("image/")
-        ) {
-
-            showToast(
-                "Escolha uma imagem válida."
-            );
-
-            return;
-
-        }
-
-
-        /*
-            Limitar tamanho
-        */
-
-        if (
-            file.size > 15 * 1024 * 1024
-        ) {
-
-            showToast(
-                "A imagem deve ter no máximo 15 MB."
-            );
-
-            return;
-
-        }
-
-
-        /*
-            Remover URL anterior
-        */
-
-        if (state.posterURL) {
-
-            URL.revokeObjectURL(
-                state.posterURL
-            );
-
-        }
-
-
-        /*
-            Criar Blob URL
-        */
-
-        state.posterURL =
-            URL.createObjectURL(file);
-
-
-        /*
-            Mostrar preview do upload
-        */
-
-        uploadPreview.src =
-            state.posterURL;
-
-        uploadPreview.style.display =
-            "block";
-
-
-        /*
-            Colocar imagem no Story
-        */
-
-        storyPoster.src =
-            state.posterURL;
-
-        bgImage.src =
-            state.posterURL;
-
-
-        /*
-            Alterar aparência da caixa
-        */
-
-        uploadBox.classList.add(
-            "has-image"
-        );
-
-
-        showToast(
-            "Poster adicionado! 🎬"
-        );
-
-
-        updatePreview();
-
-    }
-);
-
-
-/* =====================================================
-   DRAG AND DROP
-===================================================== */
-
-uploadBox.addEventListener(
-    "dragover",
-    (event) => {
-
-        event.preventDefault();
-
-        uploadBox.style.borderColor =
-            "#ff70b5";
-
-    }
-);
-
-
-uploadBox.addEventListener(
-    "dragleave",
-    () => {
-
-        uploadBox.style.borderColor =
-            "";
-
-    }
-);
-
-
-uploadBox.addEventListener(
-    "drop",
-    (event) => {
-
-        event.preventDefault();
-
-        uploadBox.style.borderColor =
-            "";
-
-
-        const file =
-            event.dataTransfer.files[0];
-
-
-        if (!file) {
-            return;
-        }
-
-
-        /*
-            Colocar arquivo no input
-        */
-
-        const dataTransfer =
-            new DataTransfer();
-
-        dataTransfer.items.add(file);
-
-        posterInput.files =
-            dataTransfer.files;
-
-
-        posterInput.dispatchEvent(
-            new Event("change")
-        );
-
-    }
-);
-
-
-/* =====================================================
+/* =========================================================
    ESTRELAS
-===================================================== */
+========================================================= */
 
-const starButtons =
-    document.querySelectorAll(
-        ".stars button"
-    );
+function setRating(rating) {
+
+    state.rating = rating;
+
+    updateRatingButtons();
+
+    updatePreview();
+
+}
 
 
-starButtons.forEach(
-    (button) => {
+document
+    .querySelectorAll(".stars-input button")
+    .forEach((button) => {
 
         button.addEventListener(
             "click",
             () => {
 
-                state.rating =
-                    Number(
-                        button.dataset.star
-                    );
-
-
-                updateStars();
-
-                updatePreview();
-
-            }
-        );
-
-
-        button.addEventListener(
-            "mouseenter",
-            () => {
-
-                const hoverRating =
-                    Number(
-                        button.dataset.star
-                    );
-
-
-                starButtons.forEach(
-                    (star) => {
-
-                        const value =
-                            Number(
-                                star.dataset.star
-                            );
-
-
-                        star.classList.toggle(
-                            "active",
-                            value <= hoverRating
-                        );
-
-                    }
+                setRating(
+                    Number(button.dataset.rating)
                 );
 
             }
         );
 
-    }
-);
+    });
 
 
-$("stars").addEventListener(
-    "mouseleave",
-    updateStars
-);
-
-
-function updateStars() {
-
-    starButtons.forEach(
-        (star) => {
-
-            const value =
-                Number(
-                    star.dataset.star
-                );
-
-
-            star.classList.toggle(
-                "active",
-                value <= state.rating
-            );
-
-        }
-    );
-
-}
-
-
-/* =====================================================
+/* =========================================================
    CORAÇÃO
-===================================================== */
+========================================================= */
 
-favoriteButton.addEventListener(
+$("heartToggle").addEventListener(
     "click",
     () => {
 
         state.favorite =
             !state.favorite;
 
-
-        favoriteButton.classList.toggle(
-            "active",
-            state.favorite
-        );
-
-
-        favoriteButton.textContent =
-            state.favorite
-                ? "♥"
-                : "♡";
-
-
         updatePreview();
 
     }
 );
 
 
-/* =====================================================
-   SELEÇÃO DE FONTE
-===================================================== */
+/* =========================================================
+   FONTE
+========================================================= */
 
-fontSelect.addEventListener(
+$("fontSelect").addEventListener(
     "change",
-    () => {
+    (event) => {
 
         state.font =
-            fontSelect.value;
-
+            event.target.value;
 
         updatePreview();
 
@@ -577,23 +261,16 @@ fontSelect.addEventListener(
 );
 
 
-/* =====================================================
+/* =========================================================
    BLUR
-===================================================== */
+========================================================= */
 
-blurRange.addEventListener(
+$("blurRange").addEventListener(
     "input",
-    () => {
+    (event) => {
 
         state.blur =
-            Number(
-                blurRange.value
-            );
-
-
-        blurValue.textContent =
-            state.blur;
-
+            Number(event.target.value);
 
         updatePreview();
 
@@ -601,23 +278,16 @@ blurRange.addEventListener(
 );
 
 
-/* =====================================================
+/* =========================================================
    ESCURECIMENTO
-===================================================== */
+========================================================= */
 
-darkRange.addEventListener(
+$("darkRange").addEventListener(
     "input",
-    () => {
+    (event) => {
 
         state.dark =
-            Number(
-                darkRange.value
-            );
-
-
-        darkValue.textContent =
-            `${state.dark}%`;
-
+            Number(event.target.value);
 
         updatePreview();
 
@@ -625,9 +295,258 @@ darkRange.addEventListener(
 );
 
 
-/* =====================================================
+/* =========================================================
+   CAMPOS DE TEXTO
+========================================================= */
+
+[
+    "title",
+    "year",
+    "director",
+    "review"
+].forEach((id) => {
+
+    $(id).addEventListener(
+        "input",
+        updatePreview
+    );
+
+});
+
+
+/* =========================================================
+   CARREGAR POSTER
+========================================================= */
+
+function loadPoster(file) {
+
+    if (!file) {
+        return;
+    }
+
+
+    if (
+        !file.type.startsWith("image/")
+    ) {
+
+        showToast(
+            "Escolha uma imagem válida."
+        );
+
+        return;
+
+    }
+
+
+    /*
+       Limite de 20 MB
+    */
+
+    if (
+        file.size > 20 * 1024 * 1024
+    ) {
+
+        showToast(
+            "A imagem deve ter no máximo 20 MB."
+        );
+
+        return;
+
+    }
+
+
+    /*
+       Liberar URL anterior
+    */
+
+    if (state.posterURL) {
+
+        URL.revokeObjectURL(
+            state.posterURL
+        );
+
+    }
+
+
+    /*
+       Criar nova URL
+    */
+
+    state.posterURL =
+        URL.createObjectURL(file);
+
+
+    /*
+       Preview principal
+    */
+
+    $("posterImage").src =
+        state.posterURL;
+
+
+    $("bgImage").src =
+        state.posterURL;
+
+
+    /*
+       Mostrar imagens
+    */
+
+    $("posterImage").style.display =
+        "block";
+
+
+    $("bgImage").style.display =
+        "block";
+
+
+    /*
+       Esconder placeholder
+    */
+
+    $("posterPlaceholder").style.display =
+        "none";
+
+
+    /*
+       Mostrar nome
+    */
+
+    $("fileName").textContent =
+        file.name;
+
+
+    updatePreview();
+
+}
+
+
+/* =========================================================
+   INPUT DO POSTER
+========================================================= */
+
+$("posterInput").addEventListener(
+    "change",
+    (event) => {
+
+        const file =
+            event.target.files[0];
+
+        loadPoster(file);
+
+    }
+);
+
+
+/* =========================================================
+   DRAG AND DROP
+========================================================= */
+
+const uploadArea =
+    $("uploadArea");
+
+
+[
+    "dragenter",
+    "dragover"
+].forEach(
+    (eventName) => {
+
+        uploadArea.addEventListener(
+            eventName,
+            (event) => {
+
+                event.preventDefault();
+
+                uploadArea.classList.add(
+                    "dragover"
+                );
+
+            }
+        );
+
+    }
+);
+
+
+[
+    "dragleave",
+    "drop"
+].forEach(
+    (eventName) => {
+
+        uploadArea.addEventListener(
+            eventName,
+            (event) => {
+
+                event.preventDefault();
+
+                uploadArea.classList.remove(
+                    "dragover"
+                );
+
+            }
+        );
+
+    }
+);
+
+
+uploadArea.addEventListener(
+    "drop",
+    (event) => {
+
+        const file =
+            event.dataTransfer.files[0];
+
+        loadPoster(file);
+
+    }
+);
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function showToast(message) {
+
+    const toast =
+        $("toast");
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        window.filmstarzToast
+    );
+
+
+    window.filmstarzToast =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            2800
+        );
+
+}
+
+
+/* =========================================================
    CARREGAR IMAGEM PARA CANVAS
-===================================================== */
+========================================================= */
 
 function loadImageForCanvas(src) {
 
@@ -638,25 +557,20 @@ function loadImageForCanvas(src) {
                 new Image();
 
 
-            img.onload = () => {
-
-                resolve(img);
-
-            };
+            img.onload =
+                () => resolve(img);
 
 
-            img.onerror = () => {
-
-                reject(
+            img.onerror =
+                () => reject(
                     new Error(
-                        "Não foi possível carregar o poster."
+                        "Erro ao carregar a imagem."
                     )
                 );
 
-            };
 
-
-            img.src = src;
+            img.src =
+                src;
 
         }
     );
@@ -664,9 +578,9 @@ function loadImageForCanvas(src) {
 }
 
 
-/* =====================================================
+/* =========================================================
    DESENHAR IMAGEM COMO COVER
-===================================================== */
+========================================================= */
 
 function drawCover(
     ctx,
@@ -699,7 +613,7 @@ function drawCover(
     ) {
 
         /*
-            Imagem mais horizontal
+           Imagem mais horizontal.
         */
 
         drawHeight =
@@ -718,7 +632,7 @@ function drawCover(
     } else {
 
         /*
-            Imagem mais vertical
+           Imagem mais vertical.
         */
 
         drawWidth =
@@ -748,9 +662,9 @@ function drawCover(
 }
 
 
-/* =====================================================
-   FUNDO BORRADO
-===================================================== */
+/* =========================================================
+   CRIAR FUNDO BORRADO
+========================================================= */
 
 function drawBlurredBackground(
     ctx,
@@ -760,185 +674,138 @@ function drawBlurredBackground(
 ) {
 
     /*
-        Canvas auxiliar
+       Canvas auxiliar.
+
+       Usamos resolução menor para criar
+       um desfoque mais confiável no celular.
     */
 
-    const tempCanvas =
+    const smallCanvas =
         document.createElement(
             "canvas"
         );
 
 
-    tempCanvas.width =
-        1080;
-
-    tempCanvas.height =
-        1920;
+    const smallWidth =
+        270;
 
 
-    const tempCtx =
-        tempCanvas.getContext("2d");
+    const smallHeight =
+        480;
 
 
-    /*
-        Blur
-    */
-
-    tempCtx.save();
+    smallCanvas.width =
+        smallWidth;
 
 
-    tempCtx.filter =
-        `blur(${Math.max(blur * 2, 2)}px)`;
+    smallCanvas.height =
+        smallHeight;
 
 
-    /*
-        Expandir a imagem
-        para eliminar bordas
-    */
-
-    drawCover(
-        tempCtx,
-        img,
-        -80,
-        -80,
-        1240,
-        2080
-    );
-
-
-    tempCtx.restore();
+    const smallCtx =
+        smallCanvas.getContext(
+            "2d"
+        );
 
 
     /*
-        Colocar no canvas principal
+       Aumentamos a área para evitar
+       bordas quando o blur é aplicado.
     */
 
-    ctx.drawImage(
-        tempCanvas,
-        0,
-        0,
-        1080,
-        1920
-    );
+    smallCtx.save();
 
 
-    /*
-        Escurecer
-    */
+    try {
 
-    ctx.fillStyle =
-        `rgba(0,0,0,${dark / 100})`;
+        smallCtx.filter =
+            `blur(${Math.max(blur / 2, 2)}px)`;
 
+    } catch (error) {
 
-    ctx.fillRect(
-        0,
-        0,
-        1080,
-        1920
-    );
-
-}
-
-
-/* =====================================================
-   TEXTO CENTRALIZADO
-===================================================== */
-
-function centerText(
-    ctx,
-    text,
-    x,
-    y
-) {
-
-    ctx.textAlign =
-        "center";
-
-    ctx.fillText(
-        text,
-        x,
-        y
-    );
-
-}
-
-
-/* =====================================================
-   QUEBRAR TEXTO
-===================================================== */
-
-function wrapText(
-    ctx,
-    text,
-    maxWidth
-) {
-
-    const words =
-        text.split(" ");
-
-
-    const lines = [];
-
-    let line = "";
-
-
-    words.forEach(
-        (word) => {
-
-            const test =
-                line
-                    ? `${line} ${word}`
-                    : word;
-
-
-            const width =
-                ctx.measureText(
-                    test
-                ).width;
-
-
-            if (
-                width > maxWidth &&
-                line
-            ) {
-
-                lines.push(line);
-
-                line = word;
-
-            } else {
-
-                line = test;
-
-            }
-
-        }
-    );
-
-
-    if (line) {
-
-        lines.push(line);
+        /*
+           Caso filter não exista,
+           a redução de resolução
+           continuará criando desfoque.
+        */
 
     }
 
 
-    return lines;
+    drawCover(
+        smallCtx,
+        img,
+        -35,
+        -35,
+        smallWidth + 70,
+        smallHeight + 70
+    );
+
+
+    smallCtx.restore();
+
+
+    /*
+       Agora ampliamos para
+       1080 × 1920.
+    */
+
+    ctx.imageSmoothingEnabled =
+        true;
+
+
+    ctx.imageSmoothingQuality =
+        "high";
+
+
+    ctx.drawImage(
+        smallCanvas,
+        0,
+        0,
+        1080,
+        1920
+    );
+
+
+    /*
+       Escurecimento.
+    */
+
+    if (dark > 0) {
+
+        ctx.fillStyle =
+            `rgba(0,0,0,${dark / 100})`;
+
+
+        ctx.fillRect(
+            0,
+            0,
+            1080,
+            1920
+        );
+
+    }
 
 }
 
 
-/* =====================================================
+/* =========================================================
    DESENHAR POSTER CENTRAL
-===================================================== */
+========================================================= */
 
-function drawCentralPoster(
+function drawPoster(
     ctx,
     img
 ) {
 
     /*
-        Tamanho do poster
+       Mesma proporção visual do preview.
+
+       Preview:
+       180 × 255
+
+       Canvas:
+       540 × 765
     */
 
     const posterWidth =
@@ -954,11 +821,11 @@ function drawCentralPoster(
 
 
     const y =
-        245;
+        250;
 
 
     /*
-        Sombra
+       Sombra.
     */
 
     ctx.save();
@@ -972,23 +839,23 @@ function drawCentralPoster(
         45;
 
 
+    ctx.shadowOffsetX =
+        0;
+
+
     ctx.shadowOffsetY =
         20;
 
-
-    /*
-        Fundo atrás do poster
-    */
 
     ctx.fillStyle =
         "#050505";
 
 
     ctx.fillRect(
-        x - 8,
-        y - 8,
-        posterWidth + 16,
-        posterHeight + 16
+        x - 10,
+        y - 10,
+        posterWidth + 20,
+        posterHeight + 20
     );
 
 
@@ -996,7 +863,8 @@ function drawCentralPoster(
 
 
     /*
-        Poster
+       Recortar exatamente
+       a área do poster.
     */
 
     ctx.save();
@@ -1031,17 +899,121 @@ function drawCentralPoster(
 }
 
 
-/* =====================================================
-   DESENHAR FILME DA VEZ
-===================================================== */
+/* =========================================================
+   DESENHAR TEXTO CENTRALIZADO
+========================================================= */
 
-function drawMovieLabel(ctx) {
+function drawCenteredText(
+    ctx,
+    text,
+    x,
+    y
+) {
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.fillText(
+        text,
+        x,
+        y
+    );
+
+}
+
+
+/* =========================================================
+   QUEBRAR TEXTO
+========================================================= */
+
+function wrapText(
+    ctx,
+    text,
+    maxWidth
+) {
+
+    const words =
+        text.split(/\s+/);
+
+
+    const lines = [];
+
+
+    let line =
+        "";
+
+
+    for (
+        const word of words
+    ) {
+
+        const test =
+            line
+                ? `${line} ${word}`
+                : word;
+
+
+        const width =
+            ctx.measureText(
+                test
+            ).width;
+
+
+        if (
+            width > maxWidth &&
+            line
+        ) {
+
+            lines.push(
+                line
+            );
+
+
+            line =
+                word;
+
+        } else {
+
+            line =
+                test;
+
+        }
+
+    }
+
+
+    if (line) {
+
+        lines.push(
+            line
+        );
+
+    }
+
+
+    return lines;
+
+}
+
+
+/* =========================================================
+   DESENHAR "FILME DA VEZ"
+========================================================= */
+
+function drawMovieLabel(
+    ctx
+) {
 
     ctx.save();
 
 
+    /*
+       Borda.
+    */
+
     ctx.strokeStyle =
-        "rgba(255,255,255,.55)";
+        "rgba(255,255,255,.45)";
 
 
     ctx.lineWidth =
@@ -1054,7 +1026,7 @@ function drawMovieLabel(ctx) {
     ctx.roundRect(
         80,
         105,
-        310,
+        305,
         75,
         38
     );
@@ -1062,6 +1034,10 @@ function drawMovieLabel(ctx) {
 
     ctx.stroke();
 
+
+    /*
+       Texto.
+    */
 
     ctx.fillStyle =
         "#ffffff";
@@ -1087,11 +1063,13 @@ function drawMovieLabel(ctx) {
 }
 
 
-/* =====================================================
+/* =========================================================
    DESENHAR CORAÇÃO
-===================================================== */
+========================================================= */
 
-function drawHeart(ctx) {
+function drawHeart(
+    ctx
+) {
 
     if (!state.favorite) {
 
@@ -1104,19 +1082,19 @@ function drawHeart(ctx) {
 
 
     ctx.font =
-        "58px Arial";
+        "55px Arial";
 
 
     ctx.fillStyle =
-        "#ff70b5";
+        "#ff78b7";
 
 
     ctx.textAlign =
-        "center";
+        "right";
 
 
     ctx.shadowColor =
-        "rgba(255,112,181,.35)";
+        "rgba(255,120,183,.45)";
 
 
     ctx.shadowBlur =
@@ -1125,7 +1103,7 @@ function drawHeart(ctx) {
 
     ctx.fillText(
         "♥",
-        990,
+        1000,
         160
     );
 
@@ -1135,37 +1113,57 @@ function drawHeart(ctx) {
 }
 
 
-/* =====================================================
-   DESENHAR TÍTULO
-===================================================== */
+/* =========================================================
+   TAMANHO DO TÍTULO
+========================================================= */
 
-function drawStoryTitle(
-    ctx,
+function getTitleSize(
     title
 ) {
 
-    let size =
-        76;
+    if (
+        title.length > 30
+    ) {
+
+        return 48;
+
+    }
+
+
+    if (
+        title.length > 24
+    ) {
+
+        return 54;
+
+    }
 
 
     if (
         title.length > 18
     ) {
 
-        size =
-            64;
+        return 62;
 
     }
 
 
-    if (
-        title.length > 26
-    ) {
+    return 76;
 
-        size =
-            54;
+}
 
-    }
+
+/* =========================================================
+   DESENHAR TÍTULO
+========================================================= */
+
+function drawTitle(
+    ctx,
+    title
+) {
+
+    const size =
+        getTitleSize(title);
 
 
     ctx.save();
@@ -1191,12 +1189,60 @@ function drawStoryTitle(
         14;
 
 
-    centerText(
-        ctx,
-        title.toUpperCase(),
-        540,
-        1435
-    );
+    /*
+       Se for muito comprido,
+       quebrar em duas linhas.
+    */
+
+    const lines =
+        wrapText(
+            ctx,
+            title.toUpperCase(),
+            850
+        );
+
+
+    if (
+        lines.length === 1
+    ) {
+
+        drawCenteredText(
+            ctx,
+            lines[0],
+            540,
+            1435
+        );
+
+    } else {
+
+        const lineHeight =
+            size * .95;
+
+
+        const firstY =
+            1435 -
+            ((lines.length - 1) *
+                lineHeight / 2);
+
+
+        lines
+            .slice(0, 2)
+            .forEach(
+                (line, index) => {
+
+                    drawCenteredText(
+                        ctx,
+                        line,
+                        540,
+                        firstY +
+                        index *
+                        lineHeight
+                    );
+
+                }
+            );
+
+    }
 
 
     ctx.restore();
@@ -1204,9 +1250,9 @@ function drawStoryTitle(
 }
 
 
-/* =====================================================
+/* =========================================================
    DESENHAR METADADOS
-===================================================== */
+========================================================= */
 
 function drawMetadata(
     ctx,
@@ -1218,24 +1264,24 @@ function drawMetadata(
 
 
     ctx.font =
-        '400 27px Inter, Arial, sans-serif';
+        "400 27px Inter, Arial, sans-serif";
 
 
     ctx.fillStyle =
-        "#e3e3e8";
+        "#e1e1e8";
 
 
     ctx.textAlign =
         "center";
 
 
-    const text =
+    const meta =
         `${year}  •  ${director.toUpperCase()}`;
 
 
-    centerText(
+    drawCenteredText(
         ctx,
-        text,
+        meta,
         540,
         1500
     );
@@ -1246,11 +1292,13 @@ function drawMetadata(
 }
 
 
-/* =====================================================
+/* =========================================================
    DESENHAR ESTRELAS
-===================================================== */
+========================================================= */
 
-function drawRating(ctx) {
+function drawRating(
+    ctx
+) {
 
     ctx.save();
 
@@ -1260,7 +1308,7 @@ function drawRating(ctx) {
 
 
     ctx.fillStyle =
-        "#ff70b5";
+        "#ff78b7";
 
 
     ctx.textAlign =
@@ -1268,11 +1316,23 @@ function drawRating(ctx) {
 
 
     const stars =
-        "★".repeat(state.rating) +
-        "☆".repeat(5 - state.rating);
+        "★".repeat(
+            state.rating
+        ) +
+        "☆".repeat(
+            5 - state.rating
+        );
 
 
-    centerText(
+    ctx.shadowColor =
+        "rgba(255,120,183,.35)";
+
+
+    ctx.shadowBlur =
+        12;
+
+
+    drawCenteredText(
         ctx,
         stars,
         540,
@@ -1285,9 +1345,9 @@ function drawRating(ctx) {
 }
 
 
-/* =====================================================
+/* =========================================================
    DESENHAR RESENHA
-===================================================== */
+========================================================= */
 
 function drawReview(
     ctx,
@@ -1324,24 +1384,35 @@ function drawReview(
         );
 
 
+    /*
+       Limitar a quantidade de linhas
+       para não invadir o rodapé.
+    */
+
+    const visibleLines =
+        lines.slice(0, 3);
+
+
     const lineHeight =
         38;
 
 
-    let startY =
+    const startY =
         1665 -
-        ((lines.length - 1) * 19);
+        ((visibleLines.length - 1) *
+            lineHeight / 2);
 
 
-    lines.forEach(
+    visibleLines.forEach(
         (line, index) => {
 
-            centerText(
+            drawCenteredText(
                 ctx,
                 line,
                 540,
                 startY +
-                index * lineHeight
+                index *
+                lineHeight
             );
 
         }
@@ -1353,25 +1424,27 @@ function drawReview(
 }
 
 
-/* =====================================================
-   DESENHAR RODAPÉ
-===================================================== */
+/* =========================================================
+   DESENHAR FOOTER
+========================================================= */
 
-function drawStoryFooter(ctx) {
+function drawFooter(
+    ctx
+) {
 
     ctx.save();
 
 
+    ctx.textAlign =
+        "center";
+
+
     ctx.font =
-        '500 18px "DM Mono", monospace';
+        "500 18px 'DM Mono', monospace";
 
 
     ctx.fillStyle =
-        "rgba(255,255,255,.65)";
-
-
-    ctx.textAlign =
-        "center";
+        "rgba(255,255,255,.60)";
 
 
     ctx.fillText(
@@ -1386,7 +1459,7 @@ function drawStoryFooter(ctx) {
 
 
     ctx.fillStyle =
-        "#ff70b5";
+        "#ff78b7";
 
 
     ctx.fillText(
@@ -1401,9 +1474,9 @@ function drawStoryFooter(ctx) {
 }
 
 
-/* =====================================================
-   GERAR STORY COMPLETO
-===================================================== */
+/* =========================================================
+   GERAR STORY
+========================================================= */
 
 async function generateStory() {
 
@@ -1417,7 +1490,24 @@ async function generateStory() {
 
 
     /*
-        Canvas final
+       Esperar as fontes carregarem.
+
+       Isso evita que o Canvas use
+       uma fonte diferente no celular.
+    */
+
+    if (
+        document.fonts &&
+        document.fonts.ready
+    ) {
+
+        await document.fonts.ready;
+
+    }
+
+
+    /*
+       Canvas final.
     */
 
     const canvas =
@@ -1435,7 +1525,9 @@ async function generateStory() {
 
 
     const ctx =
-        canvas.getContext("2d");
+        canvas.getContext(
+            "2d"
+        );
 
 
     ctx.imageSmoothingEnabled =
@@ -1447,7 +1539,7 @@ async function generateStory() {
 
 
     /*
-        Carregar poster
+       Carregar poster.
     */
 
     const poster =
@@ -1457,7 +1549,9 @@ async function generateStory() {
 
 
     /*
-        1. Fundo
+       =====================================
+       1 — FUNDO
+       =====================================
     */
 
     drawBlurredBackground(
@@ -1469,53 +1563,73 @@ async function generateStory() {
 
 
     /*
-        2. Poster central
+       =====================================
+       2 — POSTER CENTRAL
+       =====================================
     */
 
-    drawCentralPoster(
+    drawPoster(
         ctx,
         poster
     );
 
 
     /*
-        3. Topo
+       =====================================
+       3 — FILME DA VEZ
+       =====================================
     */
 
-    drawMovieLabel(ctx);
+    drawMovieLabel(
+        ctx
+    );
 
 
     /*
-        4. Coração
+       =====================================
+       4 — CORAÇÃO
+       =====================================
     */
 
-    drawHeart(ctx);
+    drawHeart(
+        ctx
+    );
 
 
     /*
-        5. Informações
+       =====================================
+       5 — INFORMAÇÕES
+       =====================================
     */
 
     const title =
-        titleInput.value.trim() ||
+        $("title")
+            .value
+            .trim() ||
         "SEU FILME";
 
 
     const year =
-        yearInput.value.trim() ||
+        $("year")
+            .value
+            .trim() ||
         "2026";
 
 
     const director =
-        directorInput.value.trim() ||
+        $("director")
+            .value
+            .trim() ||
         "SEU DIRETOR";
 
 
     const review =
-        reviewInput.value.trim();
+        $("review")
+            .value
+            .trim();
 
 
-    drawStoryTitle(
+    drawTitle(
         ctx,
         title
     );
@@ -1528,7 +1642,9 @@ async function generateStory() {
     );
 
 
-    drawRating(ctx);
+    drawRating(
+        ctx
+    );
 
 
     drawReview(
@@ -1538,10 +1654,14 @@ async function generateStory() {
 
 
     /*
-        6. Rodapé
+       =====================================
+       6 — FOOTER
+       =====================================
     */
 
-    drawStoryFooter(ctx);
+    drawFooter(
+        ctx
+    );
 
 
     return canvas;
@@ -1549,11 +1669,201 @@ async function generateStory() {
 }
 
 
-/* =====================================================
-   DOWNLOAD
-===================================================== */
+/* =========================================================
+   GERAR NOME DO ARQUIVO
+========================================================= */
 
-downloadBtn.addEventListener(
+function createFilename() {
+
+    const title =
+        $("title")
+            .value
+            .trim() ||
+        "meu-filme";
+
+
+    let clean =
+        title
+            .normalize("NFD")
+            .replace(
+                /[\u0300-\u036f]/g,
+                ""
+            )
+            .toLowerCase()
+            .replace(
+                /[^a-z0-9]+/g,
+                "-"
+            )
+            .replace(
+                /^-+|-+$/g,
+                ""
+            );
+
+
+    if (!clean) {
+
+        clean =
+            "story";
+
+    }
+
+
+    return `filmstarz-${clean}.png`;
+
+}
+
+
+/* =========================================================
+   BAIXAR ARQUIVO
+========================================================= */
+
+function downloadBlob(
+    blob,
+    filename
+) {
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        filename;
+
+
+    link.style.display =
+        "none";
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    document.body.removeChild(
+        link
+    );
+
+
+    /*
+       Liberar memória.
+    */
+
+    setTimeout(
+        () => {
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        },
+        5000
+    );
+
+}
+
+
+/* =========================================================
+   COMPARTILHAR NO CELULAR
+========================================================= */
+
+async function tryNativeShare(
+    blob,
+    filename
+) {
+
+    if (
+        !navigator.share ||
+        !navigator.canShare
+    ) {
+
+        return false;
+
+    }
+
+
+    try {
+
+        const file =
+            new File(
+                [blob],
+                filename,
+                {
+                    type:
+                        "image/png"
+                }
+            );
+
+
+        const shareData = {
+            files: [file],
+
+            title:
+                "Meu Story — filmstarz"
+        };
+
+
+        if (
+            !navigator.canShare(
+                shareData
+            )
+        ) {
+
+            return false;
+
+        }
+
+
+        await navigator.share(
+            shareData
+        );
+
+
+        return true;
+
+    } catch (error) {
+
+        /*
+           O usuário pode ter fechado
+           a janela de compartilhamento.
+        */
+
+        if (
+            error.name ===
+            "AbortError"
+        ) {
+
+            return true;
+
+        }
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   BOTÃO DOWNLOAD
+========================================================= */
+
+$("downloadBtn").addEventListener(
     "click",
     async () => {
 
@@ -1568,22 +1878,26 @@ downloadBtn.addEventListener(
         }
 
 
-        const originalText =
-            downloadBtn.innerHTML;
+        const button =
+            $("downloadBtn");
+
+
+        const originalHTML =
+            button.innerHTML;
 
 
         try {
 
-            downloadBtn.disabled =
+            button.disabled =
                 true;
 
 
-            downloadBtn.innerHTML =
+            button.innerHTML =
                 "<span>…</span> Gerando Story";
 
 
             /*
-                Criar imagem
+               Gerar Canvas.
             */
 
             const canvas =
@@ -1591,7 +1905,7 @@ downloadBtn.addEventListener(
 
 
             /*
-                Transformar em PNG
+               Transformar em PNG.
             */
 
             const blob =
@@ -1600,8 +1914,7 @@ downloadBtn.addEventListener(
 
                         canvas.toBlob(
                             resolve,
-                            "image/png",
-                            1
+                            "image/png"
                         );
 
                     }
@@ -1617,165 +1930,43 @@ downloadBtn.addEventListener(
             }
 
 
-            /*
-                Nome do arquivo
-            */
-
-            let filename =
-                titleInput.value.trim() ||
-                "meu-filme";
-
-
-            filename =
-                filename
-                    .toLowerCase()
-                    .normalize("NFD")
-                    .replace(
-                        /[\u0300-\u036f]/g,
-                        ""
-                    )
-                    .replace(
-                        /[^a-z0-9]+/g,
-                        "-"
-                    )
-                    .replace(
-                        /^-|-$/g,
-                        ""
-                    );
-
-
-            filename =
-                `filmstarz-${filename || "story"}.png`;
+            const filename =
+                createFilename();
 
 
             /*
-                ====================================
-                COMPARTILHAMENTO NO CELULAR
-                ====================================
+               =====================================
+               CELULAR
+               =====================================
             */
 
-            const file =
-                new File(
-                    [blob],
-                    filename,
-                    {
-                        type:
-                            "image/png"
-                    }
+            const shared =
+                await tryNativeShare(
+                    blob,
+                    filename
                 );
 
 
-            /*
-                Se o navegador suporta
-                compartilhamento de arquivos,
-                usamos o sistema nativo.
-            */
+            if (shared) {
 
-            if (
-                navigator.share &&
-                navigator.canShare &&
-                navigator.canShare({
-                    files: [file]
-                })
-            ) {
+                showToast(
+                    "Story pronto! ✨"
+                );
 
-                try {
-
-                    await navigator.share({
-
-                        files: [file],
-
-                        title:
-                            "Meu Story — filmstarz"
-
-                    });
-
-
-                    showToast(
-                        "Story pronto! ✨"
-                    );
-
-
-                    return;
-
-                } catch (shareError) {
-
-                    /*
-                        Se o usuário cancelar o
-                        compartilhamento, não mostramos
-                        erro.
-                    */
-
-                    if (
-                        shareError.name ===
-                        "AbortError"
-                    ) {
-
-                        return;
-
-                    }
-
-                }
+                return;
 
             }
 
 
             /*
-                ====================================
-                DOWNLOAD NORMAL
-                ====================================
+               =====================================
+               PC / DOWNLOAD NORMAL
+               =====================================
             */
 
-            const url =
-                URL.createObjectURL(
-                    blob
-                );
-
-
-            const link =
-                document.createElement(
-                    "a"
-                );
-
-
-            link.href =
-                url;
-
-
-            link.download =
-                filename;
-
-
-            link.style.display =
-                "none";
-
-
-            document.body.appendChild(
-                link
-            );
-
-
-            link.click();
-
-
-            document.body.removeChild(
-                link
-            );
-
-
-            /*
-                Liberar memória
-            */
-
-            setTimeout(
-                () => {
-
-                    URL.revokeObjectURL(
-                        url
-                    );
-
-                },
-                5000
+            downloadBlob(
+                blob,
+                filename
             );
 
 
@@ -1783,33 +1974,26 @@ downloadBtn.addEventListener(
                 "Story baixado com sucesso! ✨"
             );
 
-
         } catch (error) {
 
             console.error(
-                "Erro ao gerar Story:",
+                "Filmstarz:",
                 error
             );
 
 
-            /*
-                ==================================
-                FALLBACK
-                ==================================
-            */
-
             showToast(
-                "Não foi possível baixar. Tente novamente."
+                "Não foi possível gerar o Story."
             );
 
         } finally {
 
-            downloadBtn.disabled =
+            button.disabled =
                 false;
 
 
-            downloadBtn.innerHTML =
-                originalText;
+            button.innerHTML =
+                originalHTML;
 
         }
 
@@ -1817,69 +2001,144 @@ downloadBtn.addEventListener(
 );
 
 
-/* =====================================================
-   TOAST
-===================================================== */
+/* =========================================================
+   RESET
+========================================================= */
 
-let toastTimeout;
+$("resetBtn").addEventListener(
+    "click",
+    () => {
+
+        /*
+           Limpar formulário.
+        */
+
+        $("title").value =
+            "";
+
+        $("year").value =
+            "";
+
+        $("director").value =
+            "";
+
+        $("review").value =
+            "";
 
 
-function showToast(message) {
+        /*
+           Resetar poster.
+        */
 
-    toast.textContent =
-        message;
+        if (state.posterURL) {
 
+            URL.revokeObjectURL(
+                state.posterURL
+            );
 
-    toast.classList.add(
-        "show"
-    );
-
-
-    clearTimeout(
-        toastTimeout
-    );
+        }
 
 
-    toastTimeout =
-        setTimeout(
-            () => {
+        state.posterURL =
+            "";
 
-                toast.classList.remove(
-                    "show"
-                );
 
-            },
-            3000
+        $("posterInput").value =
+            "";
+
+
+        $("posterImage").src =
+            "";
+
+
+        $("bgImage").src =
+            "";
+
+
+        $("posterImage").style.display =
+            "none";
+
+
+        $("bgImage").style.display =
+            "none";
+
+
+        $("posterPlaceholder").style.display =
+            "flex";
+
+
+        $("fileName").textContent =
+            "";
+
+
+        /*
+           Resetar controles.
+        */
+
+        state.rating =
+            5;
+
+
+        state.favorite =
+            true;
+
+
+        state.font =
+            "Inter";
+
+
+        state.blur =
+            18;
+
+
+        state.dark =
+            45;
+
+
+        $("fontSelect").value =
+            "Inter";
+
+
+        $("blurRange").value =
+            18;
+
+
+        $("darkRange").value =
+            45;
+
+
+        updateRatingButtons();
+
+        updatePreview();
+
+
+        showToast(
+            "Tudo limpo! 🎬"
         );
 
-}
+    }
+);
 
 
-/* =====================================================
+/* =========================================================
    INICIALIZAÇÃO
-===================================================== */
+========================================================= */
 
-updateStars();
+updateRatingButtons();
 
 updatePreview();
 
-blurValue.textContent =
-    state.blur;
 
-darkValue.textContent =
-    `${state.dark}%`;
-
-
-/* =====================================================
-   EVITAR QUE IMAGENS FIQUEM ARRASTÁVEIS
-===================================================== */
+/* =========================================================
+   IMPEDIR ARRASTAR IMAGENS
+========================================================= */
 
 document
     .querySelectorAll("img")
     .forEach(
-        (img) => {
+        (image) => {
 
-            img.draggable =
+            image.draggable =
                 false;
 
         }
